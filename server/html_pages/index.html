@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Главная страница</title>
+<link rel="stylesheet" href="styles.css">
+	<script src="myscript.js"></script>	
+	<style>
+		
+@keyframes slideIn {
+      from {
+        transform: translateX(100%);
+      }
+      to {
+        transform: translateX(0);
+      }
+    }
+		
+    body {
+      background-image: url("Main.jpg");
+      background-repeat: no-repeat;
+      background-size: cover;
+		font-family: "Times New Roman", Times, serif;
+		animation: slideIn 0.5s ease-in-out;
+
+    }
+		
+  </style>
+</head>
+<body style="overflow: hidden;">
+  <h2>Web-ресурс, посвященный вопросам реабилитации.</h2>
+  <p style="background-color: rgba(255, 255, 255, 0.5);">Добро пожаловать в веб-сервис, посвящённый реабилитации. 
+	Реабилитация является важным этапом восстановления и адаптации людей, которые столкнулись с различными видами травм, заболеваниями или потерей функциональных способностей. Она имеет целью помочь людям достичь оптимального уровня физического, психологического и социального благополучия.</p>
+	<p style="background-color: rgba(255, 255, 255, 0.5);">Данный веб-сервис поддерживает голосовой поиск, для того чтобы воспользоваться им предоставьте браузеру разрешение к исполькованию микрофона. После предоставления разрешения произнесите фразу "перейти на" и дальше скажите куда конкретно вы намерены перейти.
+	Вот возможные варианы команды: "перейти на дневник тренировок", "перейти на дневник питания", "перейти на дневник приёма таблеток", "перейти на заметки", "перейти на календарь", "перейти на личное расписание", "перейти на расписание занятий", "перейти на информацию о ЧМТ", "о проекте"</p>
+  <form onsubmit="handleSearch(event)">
+    <input type="search" id="searchInput" name="searchInput" placeholder="Введите запрос">
+    <button type="submit">Найти</button>
+  </form>
+	<p style="background-color: rgba(255, 255, 255, 0.5);">Выберите интересующий вас раздел:</p>
+  <ul>
+    <li class="searchable-item"><a href="Training_diary.html">Дневник тренировок</a></li>
+    <li class="searchable-item"><a href="Food_diary.html">Дневник питания</a></li>
+	  <li class="searchable-item"><a href="Pill_diary.html">Дневник приёма таблеток</a></li>
+    <li class="searchable-item"><a href="Notes.html">Заметки</a></li>
+	  <li class="searchable-item"><a href="Calendar.html">Календарь</a></li>
+	  <li class="searchable-item"><a href="Schedule.html">Личное расписание</a></li>
+	  <li class="searchable-item"><a href="Schedule_of_classes_in_the_rehabilitation_center.html">Расписание занятий в реабилитационном центре</a></li>
+	  <li class="searchable-item"><a href="Info.html">Информация о травме</a></li>
+	  <li class="searchable-item"><a href="About.html">О проекте</a></li>
+	  
+</ul>
+	
+</body>
+</html>

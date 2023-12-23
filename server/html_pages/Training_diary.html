@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+    <title>Дневник тренировок</title>
+    <style>
+		
+		/* Стили для ссылки */
+        .top-right-link {
+            position: absolute;
+            top: 10px; /* Расположение сверху */
+            right: 10px; /* Расположение справа */
+        }
+		
+        hr {
+            border: none;
+            border-top: 1px solid #000;
+            margin: 10px 0;
+			
+        }
+		body {
+      background-image: url("Training_diary.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+		font-family: "Times New Roman", Times, serif;
+    }
+    </style>
+	
+	
+	
+</head>
+<body>
+    <h1>Дневник тренировок</h1>
+	    <a href="index.html" class="top-right-link">Вернуться на главную</a>
+    <form>
+        <label for="exercise">Упражнение:</label>
+        <input type="text" id="exercise" name="exercise" required>
+        <br>
+        <label for="sets">Количество подходов:</label>
+        <input type="number" id="sets" name="sets" required>
+        <br>
+        <label for="reps">Количество повторений:</label>
+        <input type="text" id="reps" name="reps" required>
+        <br>
+        <input type="submit" value="Добавить">
+    </form>
+	
+
+    <h2>Список упражнений</h2>
+    <ul id="workout-list">
+        <!-- Здесь будут добавляться тренировки -->
+    </ul>
+
+    <button id="add-divider">Добавить разделительную линию</button>
+    <button id="delete-all">Удалить все записи</button>
+
+    <script>
+        // Функция для сохранения данных в локальное хранилище
+        function saveWorkouts() {
+            var workoutList = document.getElementById('workout-list');
+            localStorage.setItem('workouts', workoutList.innerHTML);
+        }
+
+        // Функция для загрузки данных из локального хранилища
+        function loadWorkouts() {
+            var workoutList = document.getElementById('workout-list');
+            var savedWorkouts = localStorage.getItem('workouts');
+            if (savedWorkouts) {
+                workoutList.innerHTML = savedWorkouts;
+
+                // Восстановление состояния чекбоксов
+                var checkboxes = workoutList.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.addEventListener('change', function() {
+                        if (checkbox.checked) {
+                            checkbox.parentNode.style.textDecoration = 'line-through';
+                        } else {
+                            checkbox.parentNode.style.textDecoration = 'none';
+                        }
+                        saveWorkouts();
+                    });
+
+                    // Проверка сохраненного состояния чекбокса
+                    var parent = checkbox.parentNode;
+                    var isCompleted = localStorage.getItem('completed-' + parent.id);
+                    if (isCompleted === 'true') {
+                        checkbox.checked = true;
+                        parent.style.textDecoration = 'line-through';
+                    }
+                });
+            }
+        }
+
+        // Обработчик отправки формы
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault(); // Отменить стандартное действие отправки формы
+
+            // Получить значения полей ввода
+            var exercise = document.getElementById('exercise').value;
+            var sets = document.getElementById('sets').value;
+            var reps = document.getElementById('reps').value;
+
+            // Создать новый элемент списка
+            var li = document.createElement('li');
+
+            // Создать текстовый узел с информацией о тренировке
+            var workoutText = document.createTextNode(exercise + ' - ' + sets + ' подход(ов), ' + reps + ' повторений');
+            li.appendChild(workoutText);
+
+            // Создать чекбокс "выполнено"
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.addEventListener('change', function() {
+                if (checkbox.checked) {
+                    li.style.textDecoration = 'line-through';
+                    localStorage.setItem('completed-' + li.id, 'true');
+                } else {
+                    li.style.textDecoration = 'none';
+                    localStorage.setItem('completed-' + li.id, 'false');
+                }
+                saveWorkouts();
+            });
+            li.appendChild(checkbox);
+
+            // Создать кнопку удаления записи
+            var deleteButton = document.createElement('button');
+            deleteButton.innerHTML = 'Удалить';
+            deleteButton.addEventListener('click', function() {
+                li.remove();
+                localStorage.removeItem('completed-' + li.id);
+                saveWorkouts();
+            });
+            li.appendChild(deleteButton);
+
+            // Присвоить уникальный идентификатор элементу списка
+            li.id = Date.now();
+
+            // Добавить элемент в список
+            var workoutList = document.getElementById('workout-list');
+            workoutList.appendChild(li);
+
+            // Сохранить записи
+            saveWorkouts();
+
+            // Очистить поля ввода
+            document.getElementById('exercise').value = '';
+            document.getElementById('sets').value = '';
+            document.getElementById('reps').value = '';
+        });
+
+        // Обработчик кнопки "Добавить разделительную линию"
+        document.getElementById('add-divider').addEventListener('click', function() {
+            var workoutList = document.getElementById('workout-list');
+            var hr = document.createElement('hr');
+            workoutList.appendChild(hr);
+            saveWorkouts();
+        });
+
+        // Обработчик кнопки "Удалить все записи"
+        document.getElementById('delete-all').addEventListener('click', function() {
+            var workoutList = document.getElementById('workout-list');
+            workoutList.innerHTML = '';
+            localStorage.clear();
+        });
+
+        // Загрузить данные при загрузке страницы
+        loadWorkouts();
+    </script>
+</body>
+</html>

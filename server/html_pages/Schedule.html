@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Управление расписанием</title>
+    <style>
+		/* Стили для ссылки */
+        .top-right-link {
+            position: absolute;
+            top: 10px; /* Расположение сверху */
+            right: 10px; /* Расположение справа */
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+		body {
+      background-color: silver;
+      font-family: "Times New Roman", Times, serif;
+		background-image: url("jpg_Schedule.jpg");
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+    </style>
+    <script>
+        function addEvent() {
+            var eventContainer = document.getElementById("eventContainer");
+            
+            var eventIndex = eventContainer.childElementCount + 1;
+            
+            var eventDiv = document.createElement("div");
+            eventDiv.id = "event" + eventIndex;
+            
+            var eventLabel = document.createElement("label");
+            eventLabel.textContent = "Мероприятие:";
+            
+            var eventNameInput = document.createElement("input");
+            eventNameInput.type = "text";
+            eventNameInput.name = "eventName" + eventIndex;
+            
+            var eventStartTimeInput = document.createElement("input");
+            eventStartTimeInput.type = "time";
+            eventStartTimeInput.name = "eventStartTime" + eventIndex;
+            
+            var eventEndTimeInput = document.createElement("input");
+            eventEndTimeInput.type = "time";
+            eventEndTimeInput.name = "eventEndTime" + eventIndex;
+            
+            var removeButton = document.createElement("button");
+            removeButton.textContent = "Удалить";
+            removeButton.onclick = function() {
+                removeEvent(eventDiv);
+            };
+            
+            eventDiv.appendChild(eventLabel);
+            eventDiv.appendChild(document.createTextNode("Название: "));
+            eventDiv.appendChild(eventNameInput);
+            eventDiv.appendChild(document.createTextNode("Время начала: "));
+            eventDiv.appendChild(eventStartTimeInput);
+            eventDiv.appendChild(document.createTextNode("Время окончания: "));
+            eventDiv.appendChild(eventEndTimeInput);
+            eventDiv.appendChild(removeButton);
+            
+            eventContainer.appendChild(eventDiv);
+        }
+        
+        function removeEvent(eventDiv) {
+            var eventContainer = document.getElementById("eventContainer");
+            eventContainer.removeChild(eventDiv);
+        }
+        
+        function saveSchedule() {
+            var eventContainer = document.getElementById("eventContainer");
+            var eventDivs = eventContainer.getElementsByTagName("div");
+            var eventData = [];
+            
+            for (var i = 0; i < eventDivs.length; i++) {
+                var eventInputs = eventDivs[i].getElementsByTagName("input");
+                
+                var event = {
+                    name: eventInputs[0].value,
+                    startTime: eventInputs[1].value,
+                    endTime: eventInputs[2].value
+                };
+                
+                eventData.push(event);
+            }
+            
+            localStorage.setItem("eventData", JSON.stringify(eventData));
+            
+            alert("Расписание сохранено!");
+        }
+        
+        function loadSchedule() {
+            var eventData = localStorage.getItem("eventData");
+            
+            if (eventData) {
+                eventData = JSON.parse(eventData);
+                
+                for (var i = 0; i < eventData.length; i++) {
+                    var event = eventData[i];
+                    
+                    addEvent();
+                    
+                    var eventDivs = document.getElementById("eventContainer").getElementsByTagName("div");
+                    var eventInputs = eventDivs[i].getElementsByTagName("input");
+                    
+                    eventInputs[0].value = event.name;
+                    eventInputs[1].value = event.startTime;
+                    eventInputs[2].value = event.endTime;
+                }
+            }
+        }
+    </script>
+</head>
+<body onload="loadSchedule()">
+    <h1>Управление расписанием</h1>
+    
+    <div id="eventContainer">
+        <button onclick="addEvent()">Добавить мероприятие</button>
+    </div>
+    
+    <br>
+    <button onclick="saveSchedule()">Сохранить расписание</button>
+	<a href="index.html" class="top-right-link">Вернуться на главную</a>
+</body>
+	
+</html>

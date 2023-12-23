@@ -1,0 +1,126 @@
+/* Общие стили для всего документа */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #F8F8F8;
+  color: #333333;
+  line-height: 1.6;
+	overflow-y: scroll;
+}
+.element {
+  transform: translateX(-100%);
+  animation: slide-in 1s forwards;
+}
+
+@keyframes slide-in {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+/* Стили для заголовков */
+h1, h2, h3 {
+  color: black;
+}
+
+/* Стили для ссылок */
+a {
+  color: black;
+  text-decoration: none;
+}
+
+a:hover {
+	color: black;
+	text-decoration: underline;
+	font-size: 20px;
+}
+
+/* Стили для параграфов */
+p {
+  margin-bottom: 15px;
+	color: black;
+	background-color: silver;
+    display: inline-block;;
+	
+}
+
+/* Стили для списков */
+ul, ol {
+  margin-left: 20px;
+}
+
+/* Стили для кнопок */
+.button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  text-decoration: none;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #45a049;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 8px;
+  border: 1px solid #CCCCCC;
+}
+
+th {
+  background-color: #F8F8F8;
+  font-weight: bold;
+}
+
+
+.info-block {
+  background-color: #F5F5F5;
+  border: 1px solid #DDDDDD;
+  padding: 20px;
+  border-radius: 4px;
+}
+
+.form-input {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+}
+
+.form-button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #007BFF;
+  color: #FFFFFF;
+  text-decoration: none;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.form-button:hover {
+  background-color: #0056b3;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+
+.element {
+  animation: fadeIn 1s ease-in-out;
+}

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Управление расписанием</title>
+    <style>
+		/* Стили для ссылки */
+        .top-right-link {
+            position: absolute;
+            top: 10px; /* Расположение сверху */
+            right: 10px; /* Расположение справа */
+        }
+		body {
+      background-color: silver;
+		font-family: "Times New Roman", Times, serif;
+    }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        function addEvent() {
+            var eventTable = document.getElementById("eventTable");
+            var rowCount = eventTable.rows.length;
+            
+            var eventRow = eventTable.insertRow(rowCount);
+            
+            var eventIndex = rowCount - 1;
+            
+            var eventNameCell = eventRow.insertCell(0);
+            var eventStartTimeCell = eventRow.insertCell(1);
+            var eventEndTimeCell = eventRow.insertCell(2);
+            var eventDaysCell = eventRow.insertCell(3);
+            var eventSpecialistCell = eventRow.insertCell(4);
+            var eventRemoveCell = eventRow.insertCell(5);
+            
+            eventNameCell.innerHTML = "<input type='text' name='eventName" + eventIndex + "'>";
+            eventStartTimeCell.innerHTML = "<input type='time' name='eventStartTime" + eventIndex + "'>";
+            eventEndTimeCell.innerHTML = "<input type='time' name='eventEndTime" + eventIndex + "'>";
+            eventDaysCell.innerHTML = "<input type='text' name='eventDays" + eventIndex + "'>";
+            eventSpecialistCell.innerHTML = "<input type='text' name='eventSpecialist" + eventIndex + "'>";
+            eventRemoveCell.innerHTML = "<button onclick='removeEvent(this.parentNode.parentNode)'>Удалить</button>";
+        }
+        
+        function removeEvent(eventRow) {
+            var eventTable = document.getElementById("eventTable");
+            eventTable.deleteRow(eventRow.rowIndex);
+        }
+        
+        function saveSchedule() {
+            var eventTable = document.getElementById("eventTable");
+            var eventRows = eventTable.rows;
+            var eventData = [];
+            
+            for (var i = 1; i < eventRows.length; i++) {
+                var eventCells = eventRows[i].cells;
+                
+                var event = {
+                    name: eventCells[0].querySelector("input").value,
+                    startTime: eventCells[1].querySelector("input").value,
+                    endTime: eventCells[2].querySelector("input").value,
+                    days: eventCells[3].querySelector("input").value,
+                    specialist: eventCells[4].querySelector("input").value
+                };
+                
+                eventData.push(event);
+            }
+            
+            localStorage.setItem("eventData", JSON.stringify(eventData));
+            
+            alert("Расписание сохранено!");
+        }
+        
+        function loadSchedule() {
+            var eventData = localStorage.getItem("eventData");
+            
+            if (eventData) {
+                eventData = JSON.parse(eventData);
+                
+                for (var i = 0; i < eventData.length; i++) {
+                    var event = eventData[i];
+                    
+                    addEvent();
+                    
+                    var eventRows = document.getElementById("eventTable").rows;
+                    var eventCells = eventRows[i + 1].cells;
+                    
+                    eventCells[0].querySelector("input").value = event.name;
+                    eventCells[1].querySelector("input").value = event.startTime;
+                    eventCells[2].querySelector("input").value = event.endTime;
+                    eventCells[3].querySelector("input").value = event.days;
+                    eventCells[4].querySelector("input").value = event.specialist;
+                }
+            }
+        }
+    </script>
+</head>
+<body onload="loadSchedule()">
+    <h1>Управление расписанием занятий в реабилитационном центре</h1>
+	<button onclick="addEvent()">Добавить мероприятие</button>
+	<button onclick="saveSchedule()">Сохранить расписание</button>
+	<a href="index.html" class="top-right-link">Вернуться на главную</a>
+    
+    <table id="eventTable">
+        <tr>
+            <th>Мероприятие</th>
+            <th>Время начала</th>
+            <th>Время окончания</th>
+            <th>Дни</th>
+            <th>Имя специалиста</th>
+          <th>Действие</th>
+      </tr>
+    </table>
+    <br>
+	<p>Пример моего расписания в реабилитационном центре:</p>
+    <br>
+	<img src="Schedule.jpg" alt="Пример расписания" style="width: 950px; height: 475px;">
+	<br>
+    <br><br>
+</body>
+</html>

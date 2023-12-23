@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Дневник питания</title>
+  <style>
+	  /* Стили для ссылки */
+        .top-right-link {
+            position: absolute;
+            top: 10px; /* Расположение сверху */
+            right: 10px; /* Расположение справа */
+        }
+    body {
+      background-color: silver;
+      font-family: "Times New Roman", Times, serif;
+		background-image: url("Food_diary.jpg");
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    h1 {
+      color: #black;
+    }
+
+    form {
+      margin-bottom: 5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 3px solid rgba(255, 255, 255, 0.5);
+    }
+
+    th {
+      background-color: silver;
+    }
+
+    .completed {
+      text-decoration: line-through;
+    }
+
+    .last-updated {
+      font-size: 12px;
+      color: #999;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Дневник питания</h1>
+
+  <form onsubmit="addEntry(event)">
+    <label for="foodName">Наименование продукта:</label>
+    <input type="text" id="foodName" required>
+    <label for="mealType">Тип приема пищи:</label>
+    <select id="mealType">
+      <option value="Завтрак">Завтрак</option>
+      <option value="Обед">Обед</option>
+      <option value="Ужин">Ужин</option>
+    </select>
+    <label for="dosage">Дозировка:</label>
+    <input type="text" id="dosage">
+    <button type="submit">Добавить</button>
+	  <a href="index.html" class="top-right-link">Вернуться на главную</a>
+  </form>
+  <table>
+    <thead>
+      <tr>
+        <th>Наименование продукта</th>
+        <th>Тип приема пищи</th>
+        <th>Дозировка</th>
+        <th>Выполнено</th>
+        <th>Действие</th>
+      </tr>
+    </thead>
+    <tbody id="foodList">
+    </tbody>
+  </table>
+
+  <p class="last-updated" id="lastUpdated" style="color: black;"></p>
+
+  <script>
+    function addEntry(event) {
+      event.preventDefault();
+
+      var foodName = document.getElementById('foodName').value;
+      var mealType = document.getElementById('mealType').value;
+      var dosage = document.getElementById('dosage').value;
+      var entryId = Date.now().toString();
+
+      var entryRow = document.createElement('tr');
+      entryRow.id = entryId;
+      entryRow.innerHTML = `
+        <td>${foodName}</td>
+        <td>${mealType}</td>
+        <td>${dosage}</td>
+        <td class="completedStatus">
+          <input type="checkbox" onchange="updateEntryStatus('${entryId}', this)">
+        </td>
+        <td>
+          <button onclick="deleteEntry('${entryId}')">Удалить</button>
+        </td>
+      `;
+
+      document.getElementById('foodList').appendChild(entryRow);
+
+      document.getElementById('foodName').value = '';
+      document.getElementById('dosage').value = '';
+
+      saveEntry(entryId, foodName, mealType, dosage, false);
+      updateLastModified();
+    }
+
+    function updateEntryStatus(entryId, checkbox) {
+      var completedStatusCell = document.getElementById(entryId).querySelector('.completedStatus');
+      if (checkbox.checked) {
+        completedStatusCell.classList.add('completed');
+      } else {
+        completedStatusCell.classList.remove('completed');
+      }
+
+      saveEntryStatus(entryId, checkbox.checked);
+      updateLastModified();
+    }
+
+    function deleteEntry(entryId) {
+      var entryRow = document.getElementById(entryId);
+      entryRow.parentNode.removeChild(entryRow);
+
+      deleteEntryStatus(entryId);
+      updateLastModified();
+    }
+
+    function saveEntry(entryId, foodName, mealType, dosage, isCompleted) {
+      var entryData = {
+        name: foodName,
+        type: mealType,
+        dosage: dosage,
+        completed: isCompleted
+      };
+
+      localStorage.setItem(entryId, JSON.stringify(entryData));
+    }
+
+    function saveEntryStatus(entryId, isChecked) {
+      var entryData = JSON.parse(localStorage.getItem(entryId));
+      if (entryData) {
+        entryData.completed = isChecked;
+        localStorage.setItem(entryId, JSON.stringify(entryData));
+      }
+    }
+
+    function deleteEntryStatus(entryId) {
+      localStorage.removeItem(entryId);
+    }
+
+    function restoreEntries() {
+      for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        if (key.match(/^\d+$/)) {
+          var entryData = JSON.parse(localStorage.getItem(key));
+          var entryRow = document.createElement('tr');
+          entryRow.id = key;
+          entryRow.innerHTML = `
+            <td>${entryData.name}</td>
+            <td>${entryData.type}</td>
+            <td>${entryData.dosage}</td>
+            <td class="completedStatus">
+              <input type="checkbox" onchange="updateEntryStatus('${key}', this)" ${entryData.completed ? 'checked' : ''}>
+            </td>
+            <td>
+              <button onclick="deleteEntry('${key}')">Удалить</button>
+            </td>
+          `;
+          if (entryData.completed) {
+            entryRow.querySelector('.completedStatus').classList.add('completed');
+          }
+          document.getElementById('foodList').appendChild(entryRow);
+        }
+      }
+    }
+
+    function updateLastModified() {
+      var now = new Date();
+      var formattedDate = `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+      document.getElementById('lastUpdated').textContent = `Последнее изменение: ${formattedDate}`;
+    }
+
+    restoreEntries();
+    updateLastModified();
+  </script>
+</body>
+</html>

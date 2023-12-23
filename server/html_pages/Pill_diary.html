@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<style>
+		/* Стили для ссылки */
+        .top-right-link {
+            position: absolute;
+            top: 10px; /* Расположение сверху */
+            right: 10px; /* Расположение справа */
+        }
+    body {
+      background-color: silver;
+      font-family: "Times New Roman", Times, serif;
+		background-image: url("Pill_diary.jpg");
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+	</style>
+  <meta charset="UTF-8">
+  <title>Дневник приёма таблеток</title>
+</head>
+<body>
+  <h1>Дневник приёма таблеток</h1>
+  <form id="taskForm">
+    <input type="text" id="taskNameInput" placeholder="Название и время приёма" required>
+    <input type="text" id="taskDosageInput" placeholder="Введите дозировку" required>
+    <button type="submit">Добавить</button>
+	  <a href="index.html" class="top-right-link">Вернуться на главную</a>
+  </form>
+  <ul id="taskList"></ul>
+  <p id="lastModified"></p>
+  <button id="deleteAllButton">Удалить всё</button>
+
+  <script>
+    var taskList = document.getElementById("taskList");
+    var taskForm = document.getElementById("taskForm");
+    var taskNameInput = document.getElementById("taskNameInput");
+    var taskDosageInput = document.getElementById("taskDosageInput");
+    var lastModified = document.getElementById("lastModified");
+    var deleteAllButton = document.getElementById("deleteAllButton");
+
+    // Загрузка списка таблеток из локального хранилища при загрузке страницы
+    var savedTasks = localStorage.getItem("tasks");
+    if (savedTasks) {
+      taskList.innerHTML = savedTasks;
+      // Восстановление состояния чекбоксов
+      var checkboxes = taskList.querySelectorAll("input[type=checkbox]");
+      checkboxes.forEach(function(checkbox) {
+        checkbox.checked = localStorage.getItem(checkbox.id) === "true";
+      });
+    }
+
+    // Загрузка последнего сохраненного времени последнего изменения при загрузке страницы
+    var lastModifiedTime = localStorage.getItem("lastModified");
+    if (lastModifiedTime) {
+      lastModified.textContent = "Последнее изменение: " + lastModifiedTime;
+    }
+
+    // Обработка отправки формы
+    taskForm.addEventListener("submit", function(event) {
+      event.preventDefault();
+      var taskName = taskNameInput.value.trim();
+      var taskDosage = taskDosageInput.value.trim();
+      if (taskName && taskDosage) {
+        addTaskToList(taskName, taskDosage);
+        taskNameInput.value = "";
+        taskDosageInput.value = "";
+        taskNameInput.focus();
+        updateLastModified();
+        saveTasks();
+      }
+    });
+
+    // Добавление задачи в список
+    function addTaskToList(name, dosage) {
+      var taskId = "task-" + Date.now();
+      var li = document.createElement("li");
+      var checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.id = taskId;
+      var nameText = document.createElement("span");
+      nameText.textContent = name;
+      var dosageText = document.createElement("span");
+      dosageText.textContent = "Дозировка: " + dosage;
+      var deleteButton = document.createElement("button");
+      deleteButton.textContent = "Удалить";
+      deleteButton.addEventListener("click", function() {
+        deleteTask(li);
+      });
+      li.appendChild(checkbox);
+      li.appendChild(nameText);
+      li.appendChild(document.createElement("br"));
+      li.appendChild(dosageText);
+      li.appendChild(document.createElement("br"));
+      li.appendChild(deleteButton);
+      taskList.appendChild(li);
+      // Сохранение состояния чекбокса при его изменении
+      checkbox.addEventListener("change", function() {
+        localStorage.setItem(checkbox.id, checkbox.checked);
+      });
+    }
+
+    // Удаление задачи из списка
+    function deleteTask(taskItem) {
+      taskItem.remove();
+      updateLastModified();
+      saveTasks();
+    }
+
+    // Удаление всего списка
+    deleteAllButton.addEventListener("click", function() {
+      taskList.innerHTML = "";
+      updateLastModified();
+      saveTasks();
+    });
+
+    // Обновление даты и времени последнего изменения
+    function updateLastModified() {
+      var currentDate = new Date();
+      var dateString = currentDate.toLocaleString();
+      lastModified.textContent = "Последнее изменение: " + dateString;
+    }
+
+    // Сохранение списка таблеток и состояния чекбоксов в локальное хранилище
+    function saveTasks() {
+      var taskItems = taskList.innerHTML;
+      localStorage.setItem("tasks", taskItems);
+      localStorage.setItem("lastModified", lastModified.textContent);
+    }
+  </script>
+</body>
+</html>
