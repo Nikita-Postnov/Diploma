@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Календарь</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css">
+	 <style>
+		 
+    body {
+      font-family: "Times New Roman", Times, serif;
+      background-color: silver;
+    }
+		 /* Стили для ссылки */
+        .top-right-link {
+            position: absolute;
+            top: 10px; /* Расположение сверху */
+            right: 10px; /* Расположение справа */
+        }
+		 </style>
+</head>
+<body>
+	<button onclick="scrollToBottom()">Вниз</button>
+  <div id="calendar"></div>
+<a href="index.html" class="top-right-link">Вернуться на главную</a>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/locale/ru.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+  <script>
+	  function scrollToBottom() {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
+    $(document).ready(function() {
+      $('#calendar').fullCalendar({
+        selectable: true,
+        select: function(start, end) {
+          // Обработчик события выбора диапазона дат
+          var title = prompt('Введите название события:');
+          if (title) {
+            var eventData = {
+              title: title,
+              start: start,
+              end: end
+            };
+            $('#calendar').fullCalendar('renderEvent', eventData, true); // Отображение события на календаре
+            saveEvents(); // Сохранение событий
+          }
+          $('#calendar').fullCalendar('unselect');
+        },
+        editable: true,
+        eventRender: function(event, element) {
+          element.append('<span class="deleteEvent">Delete</span>'); // Добавление кнопки удаления к каждому событию
+        },
+        eventClick: function(event, jsEvent, view) {
+          // Обработчик события клика по событию на календаре
+          if ($(jsEvent.target).hasClass('deleteEvent')) {
+            var deleteEvent = confirm("Вы уверены, что хотите удалить событие?");
+            if (deleteEvent) {
+              $('#calendar').fullCalendar('removeEvents', event._id); // Удаление события с календаря
+              saveEvents(); // Сохранение событий
+            }
+          }
+        },
+        events: getSavedEvents(), // Загрузка сохраненных событий при инициализации календаря
+      });
+
+      function saveEvents() {
+        // Сохранение событий в локальное хранилище
+        var events = $('#calendar').fullCalendar('clientEvents').map(function(event) {
+          return {
+            id: event.id,
+            title: event.title,
+            start: event.start.format(),
+            end: event.end.format()
+          };
+        });
+        localStorage.setItem('calendarEvents', JSON.stringify(events));
+      }
+
+      function getSavedEvents() {
+        // Получение сохраненных событий из локального хранилища
+        var savedEvents = localStorage.getItem('calendarEvents');
+        return savedEvents ? JSON.parse(savedEvents) : [];
+      }
+    });
+  </script>
+</body>
+</html>

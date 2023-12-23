@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+  <title>Управление заметками</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<style>
+		/* Стили для ссылки */
+        .top-right-link {
+            position: absolute;
+            top: 10px; /* Расположение сверху */
+            right: 10px; /* Расположение справа */
+        }
+	body {
+      background-color: silver;
+      font-family: "Times New Roman", Times, serif;
+		background-image: url("Notes.jpg");
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+</style>
+</head>
+<body>
+  <h1>Заметки</h1>
+  
+  <h2>Добавить заметку:</h2>
+  <textarea id="noteText" placeholder="Введите текст заметки" rows="5" cols="50"></textarea>
+	<br>
+  <button onclick="addNote()">Добавить</button>
+	<a href="index.html" class="top-right-link">Вернуться на главную</a>
+  
+  <h2>Список заметок:</h2>
+  <ul id="noteList"></ul>
+  
+  <button onclick="deleteAllNotes()">Удалить все заметки</button>
+  
+  <button onclick="startVoiceRecognition()">Голосовой ввод</button>
+  
+  <script>
+    // Функция для добавления заметки
+    function addNote() {
+      var noteText = document.getElementById('noteText').value;
+      if (noteText.trim() !== '') {
+        var noteId = Date.now().toString();
+        var note = {
+          id: noteId,
+          text: noteText,
+          completed: false
+        };
+        var notes = JSON.parse(localStorage.getItem('notes')) || [];
+        notes.push(note);
+        localStorage.setItem('notes', JSON.stringify(notes));
+        displayNotes();
+        document.getElementById('noteText').value = '';
+      }
+    }
+    
+    // Функция для отображения заметок
+    function displayNotes() {
+      var noteList = document.getElementById('noteList');
+      noteList.innerHTML = '';
+      var notes = JSON.parse(localStorage.getItem('notes')) || [];
+      notes.forEach(function(note) {
+        var li = document.createElement('li');
+        var checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = note.completed;
+        checkbox.addEventListener('change', function() {
+          note.completed = this.checked;
+          saveNotes(notes);
+        });
+        var text = document.createElement('span');
+        text.textContent = note.text;
+        var deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Удалить';
+        deleteButton.addEventListener('click', function() {
+          deleteNote(note.id);
+        });
+        li.appendChild(checkbox);
+        li.appendChild(text);
+        li.appendChild(deleteButton);
+        noteList.appendChild(li);
+      });
+    }
+    
+    // Функция для удаления заметки
+    function deleteNote(noteId) {
+      var notes = JSON.parse(localStorage.getItem('notes')) || [];
+      var filteredNotes = notes.filter(function(note) {
+        return note.id !== noteId;
+      });
+      saveNotes(filteredNotes);
+    }
+    
+    // Функция для удаления всех заметок
+    function deleteAllNotes() {
+      localStorage.removeItem('notes');
+      displayNotes();
+    }
+    
+    // Функция для сохранения заметок в локальное хранилище
+    function saveNotes(notes) {
+      localStorage.setItem('notes', JSON.stringify(notes));
+      displayNotes();
+    }
+    
+    // Обработчик события при загрузке страницы
+    window.onload = function() {
+      displayNotes();
+    };
+
+    // Распознавание голоса
+    var recognition = new webkitSpeechRecognition();
+    recognition.lang = 'ru-RU';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+  
+    recognition.onresult = function(event) {
+      var result = event.results[0][0].transcript;
+      document.getElementById('noteText').value = result;
+    }
+  
+    function startVoiceRecognition() {
+      recognition.start();
+    }
+  </script>
+</body>
+</html>
